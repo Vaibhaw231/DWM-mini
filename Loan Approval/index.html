@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Approval Prediction &amp; Analytics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- HEADER & NAVIGATION -->
+  <header class="site-header">
+    <div class="nav-container">
+      <div class="logo-area" onclick="navigateTo('home')">
+        <svg class="bank-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M12 2L2 7h20L12 2z"/>
+        </svg>
+        <span class="site-title">Loan Approval Prediction</span>
+      </div>
+      <nav class="main-nav" id="mainNav">
+        <button class="nav-link active" data-target="home">Home</button>
+        <button class="nav-link" data-target="predict">Predict Loan</button>
+        <button class="nav-link admin-only role-hidden" data-target="import-csv">Import CSV</button>
+        <button class="nav-link admin-only role-hidden" data-target="classification">Classification</button>
+        <button class="nav-link admin-only role-hidden" data-target="comparison">Model Comparison</button>
+        <button class="nav-link admin-only role-hidden" data-target="linear-regression">Linear Regression</button>
+        <button class="nav-link admin-only role-hidden" data-target="apriori">Apriori Mining</button>
+        <button class="nav-link admin-only role-hidden" data-target="results">Results</button>
+        <button class="nav-link admin-only role-hidden" data-target="visualization">Visualization</button>
+      </nav>
+      <div class="nav-role-widget">
+        <span class="role-badge user" id="roleBadge"><span class="role-dot user"></span> User Mode</span>
+        <button type="button" class="btn-role-switch user" id="btnRoleSwitch" onclick="toggleRole()">Switch to Admin ⚙️</button>
+      </div>
+      <div class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="content-wrapper">
+
+    <!-- 1. HOME SECTION -->
+    <section id="home" class="page-section active">
+      <div class="hero-card">
+        <h1 class="hero-title">Loan Approval Prediction</h1>
+        <p class="hero-subtitle">Predict whether a loan application is likely to be approved using data-driven classification.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="switchRole('user', true)">Start Prediction (User Mode)</button>
+          <button class="btn btn-outline admin-hero-action" style="display: none;" onclick="loadSampleDataAndGo('import-csv')">Explore Sample Data</button>
+          <button class="btn btn-secondary admin-hero-action" style="display: none;" onclick="navigateTo('comparison')">View Model Comparison</button>
+          <button class="btn btn-outline" id="heroRoleToggleBtn" onclick="toggleRole()">Switch to Admin Portal ⚙️</button>
+        </div>
+      </div>
+
+      <!-- PORTAL SELECTION: USER INTERFACE vs ADMIN INTERFACE -->
+      <div class="portal-selection-section">
+        <div class="portal-selection-header">
+          <h2 class="portal-selection-title">Select Portal Interface</h2>
+          <p class="portal-selection-subtitle">Choose between the streamlined Applicant Interface and the full Administrator Analytics Suite.</p>
+        </div>
+
+        <div class="portal-cards-grid">
+          <!-- CARD 1: USER INTERFACE -->
+          <div class="portal-card user-portal-card active-role" onclick="switchRole('user', true)">
+            <div class="portal-card-badge user-badge">User Interface</div>
+            <div class="portal-icon-box user-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <h3 class="portal-title">Applicant Portal</h3>
+            <p class="portal-desc">Streamlined for borrowers and students. Evaluate individual loan eligibility without technical data science tables or graphs.</p>
+            <ul class="portal-features-list">
+              <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Dedicated "Predict Loan" application form</li>
+              <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Instant Approved / Rejected decision</li>
+              <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Fast, clutter-free user experience</li>
+            </ul>
+            <button class="btn btn-primary portal-btn">Enter User Interface (Predict Loan) &rarr;</button>
+          </div>
+
+          <!-- CARD 2: ADMIN INTERFACE -->
+          <div class="portal-card admin-portal-card" onclick="switchRole('admin', true)">
+            <div class="portal-card-badge admin-badge">Administrator &amp; Analytics</div>
+            <div class="portal-icon-box admin-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
+            </div>
+            <h3 class="portal-title">Administrator Portal</h3>
+            <p class="portal-desc">Full banking suite for credit officers &amp; analysts. Access dataset tables, CSV import, 5 ML models, regression &amp; graphs.</p>
+            <ul class="portal-features-list">
+              <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> CSV Dataset Upload, Table Search &amp; Pagination</li>
+              <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> 5 ML Models Comparison (Accuracy, F1, Recall)</li>
+              <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Linear Regression, Apriori Mining &amp; 4 Charts</li>
+            </ul>
+            <button class="btn btn-secondary portal-btn">Enter Admin Portal (All Options) &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" onclick="navigateTo('predict')">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="5" width="20" height="14" rx="2"/>
+              <line x1="2" y1="10" x2="22" y2="10"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Loan Prediction</h3>
+          <p class="feature-desc">Fill out borrower details to forecast loan approval with real-time model scoring and key credit risk factors.</p>
+          <span class="card-link-text">Try Form &rarr;</span>
+        </div>
+
+        <div class="feature-card admin-feature locked-card" onclick="navigateTo('comparison')">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 20V10M12 20V4M6 20v-6"/>
+            </svg>
+          </div>
+          <span class="admin-lock-badge">🔒 Admin Portal</span>
+          <h3 class="feature-title">Model Comparison</h3>
+          <p class="feature-desc">Compare 5 distinct ML models (KNN, Logistic Regression, Decision Tree, Random Forest, Naive Bayes) side-by-side with an interactive comparison graph.</p>
+          <span class="card-link-text">Compare Models &rarr;</span>
+        </div>
+
+        <div class="feature-card admin-feature locked-card" onclick="navigateTo('linear-regression')">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="19" x2="20" y2="5"/>
+              <circle cx="7" cy="17" r="2"/>
+              <circle cx="11" cy="13" r="2"/>
+              <circle cx="15" cy="10" r="2"/>
+              <circle cx="18" cy="6" r="2"/>
+            </svg>
+          </div>
+          <span class="admin-lock-badge">🔒 Admin Portal</span>
+          <h3 class="feature-title">Linear Regression</h3>
+          <p class="feature-desc">Ordinary Least Squares linear regression model predicting eligible Loan Amount from Applicant Income, featuring scatter plot with regression line.</p>
+          <span class="card-link-text">Run Regression &rarr;</span>
+        </div>
+
+        <div class="feature-card admin-feature locked-card" onclick="navigateTo('apriori')">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="6" cy="6" r="3"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="12" r="3"/>
+              <line x1="8.5" y1="7.5" x2="15.5" y2="10.5"/>
+              <line x1="8.5" y1="16.5" x2="15.5" y2="13.5"/>
+            </svg>
+          </div>
+          <span class="admin-lock-badge">🔒 Admin Portal</span>
+          <h3 class="feature-title">Apriori Mining</h3>
+          <p class="feature-desc">Discover frequent itemsets and association rules with calculated Support, Confidence, and Lift for loan demographic patterns.</p>
+          <span class="card-link-text">Mine Rules &rarr;</span>
+        </div>
+
+        <div class="feature-card admin-feature locked-card" onclick="navigateTo('import-csv')">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <span class="admin-lock-badge">🔒 Admin Portal</span>
+          <h3 class="feature-title">CSV Analysis</h3>
+          <p class="feature-desc">Upload your own CSV dataset or load the built-in 121-record sample dataset with instant client-side table search and pagination.</p>
+          <span class="card-link-text">Import Data &rarr;</span>
+        </div>
+
+        <div class="feature-card admin-feature locked-card" onclick="navigateTo('visualization')">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
+          <span class="admin-lock-badge">🔒 Admin Portal</span>
+          <h3 class="feature-title">Data Visualizations</h3>
+          <p class="feature-desc">4 dynamic SVG &amp; Canvas charts for approval ratios, income tiers, loan amounts, and education correlation.</p>
+          <span class="card-link-text">View Charts &rarr;</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PREDICT LOAN SECTION -->
+    <section id="predict" class="page-section">
+      <div class="role-portal-banner user-banner" id="predictRoleBanner">
+        <div class="role-portal-banner-info">
+          <span class="role-pill-small user">👤 Applicant User Interface</span>
+          <p>You are viewing the streamlined applicant loan evaluation form. All dataset tools, ML models, and analytics are accessible in the Administrator Portal.</p>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="switchRole('admin', true)">Switch to Admin Mode ⚙️</button>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">Loan Application Assessment</h2>
+        <p class="section-subtitle">Enter borrower details below to evaluate eligibility and forecast loan approval likelihood.</p>
+      </div>
+
+      <div class="predict-layout">
+        <div class="form-card">
+          <form id="predictionForm" onsubmit="handlePredictSubmit(event)">
+            <div class="form-grid">
+              
+              <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" required>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="married">Married</label>
+                <select id="married" required>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="dependents">Dependents</label>
+                <select id="dependents" required>
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3+">3+</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="education">Education</label>
+                <select id="education" required>
+                  <option value="Graduate">Graduate</option>
+                  <option value="Not Graduate">Not Graduate</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="selfEmployed">Self Employed</label>
+                <select id="selfEmployed" required>
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="applicantIncome">Applicant Monthly Income (₹ / month)</label>
+                <input type="number" id="applicantIncome" min="0" step="any" placeholder="e.g. 50000" value="45000" required>
+              </div>
+
+              <div class="form-group">
+                <label for="coapplicantIncome">Coapplicant Monthly Income (₹ / month)</label>
+                <input type="number" id="coapplicantIncome" min="0" step="any" placeholder="e.g. 15000" value="15000" required>
+              </div>
+
+              <div class="form-group">
+                <label for="loanAmount">Loan Amount (₹)</label>
+                <input type="number" id="loanAmount" min="1" step="any" placeholder="Enter any loan amount (e.g. 120000 or 120)" value="120000" required>
+              </div>
+
+              <div class="form-group">
+                <label for="loanTerm">Loan Tenure (Min. 1 Year / 12 Months)</label>
+                <select id="loanTerm" required>
+                  <option value="12">1 Year (12 Months - Minimum)</option>
+                  <option value="24">2 Years (24 Months)</option>
+                  <option value="36">3 Years (36 Months)</option>
+                  <option value="60">5 Years (60 Months)</option>
+                  <option value="84">7 Years (84 Months)</option>
+                  <option value="120">10 Years (120 Months)</option>
+                  <option value="180">15 Years (180 Months)</option>
+                  <option value="240">20 Years (240 Months)</option>
+                  <option value="360" selected>30 Years (360 Months)</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="creditHistory">Credit History</label>
+                <select id="creditHistory" required>
+                  <option value="1" selected>Meets Guidelines (Good - 1)</option>
+                  <option value="0">Does Not Meet Guidelines (Poor - 0)</option>
+                </select>
+              </div>
+
+            </div>
+
+            <div class="form-footer">
+              <button type="submit" class="btn btn-primary btn-large">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                  <polyline points="9 11 12 14 22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                Predict Loan Approval
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="fillQuickSampleForm()">Fill Example Profile</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Result Display Card -->
+        <div class="result-sidebar">
+          <div id="predictionResultPlaceholder" class="placeholder-card">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+            </div>
+            <h3>Awaiting Evaluation</h3>
+            <p>Fill out the applicant details and click <strong>Predict Loan Approval</strong> to see instant qualification results and confidence score.</p>
+          </div>
+
+          <div id="predictionResultCard" class="result-card hidden">
+            <div class="result-status-badge" id="resultStatusBadge">Status</div>
+            <h3 class="result-decision" id="resultDecisionTitle">Loan Status</h3>
+            <p class="result-summary" id="resultSummaryText">Analysis outcome</p>
+
+            <div class="probability-container">
+              <div class="prob-header">
+                <span>Approval Confidence Score</span>
+                <strong id="resultProbabilityText">0%</strong>
+              </div>
+              <div class="prob-bar-track">
+                <div class="prob-bar-fill" id="resultProgressBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="factors-list" id="resultFactorsList">
+              <!-- Dynamically added key factors -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. IMPORT CSV SECTION -->
+    <section id="import-csv" class="page-section">
+      <div class="section-header">
+        <h2 class="section-title">Import &amp; Explore Dataset</h2>
+        <p class="section-subtitle">Load your loan records securely. All calculations run strictly inside your browser.</p>
+      </div>
+
+      <div class="upload-container">
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="csvFileInput" accept=".csv" class="file-input-hidden">
+          <div class="drop-zone-content">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <h3 class="drop-zone-title">Upload Loan Dataset</h3>
+            <p class="drop-zone-subtitle">Drag and drop your <strong>.csv</strong> file here, or click to browse files</p>
+            <div class="drop-actions">
+              <button type="button" class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()">Browse Computer</button>
+              <button type="button" class="btn btn-outline" id="loadSampleBtn" onclick="loadSampleDataset()">Load Sample Dataset</button>
+            </div>
+            <span class="file-format-hint">Pure client-side processing &bull; Supports standard loan columns</span>
+          </div>
+        </div>
+
+        <div class="dataset-stats-grid" id="datasetStatsGrid">
+          <div class="stat-card">
+            <span class="stat-label">File Name</span>
+            <span class="stat-value" id="statFileName">No file loaded</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Total Records</span>
+            <span class="stat-value" id="statRecordCount">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Total Columns</span>
+            <span class="stat-value" id="statColumnCount">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Target Column</span>
+            <span class="stat-value stat-target" id="statTargetCol">Auto-detecting...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CSV DATA TABLE SECTION -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="table-title-area">
+            <h3>Dataset Preview</h3>
+            <span class="table-count-badge" id="tableRecordSummary">0 records</span>
+          </div>
+          <div class="table-search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="tableSearchInput" placeholder="Search any record..." oninput="handleTableSearch(this.value)">
+          </div>
+        </div>
+
+        <div class="table-responsive-container">
+          <table class="data-table" id="datasetTable">
+            <thead id="tableThead">
+              <tr><th>Load a dataset to view rows</th></tr>
+            </thead>
+            <tbody id="tableTbody">
+              <tr><td class="empty-cell">No dataset imported yet. Click "Load Sample Dataset" above to test instantly.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-pagination-footer">
+          <span class="pagination-info" id="paginationInfo">Showing 0 - 0</span>
+          <div class="pagination-controls">
+            <button class="btn btn-sm btn-outline" id="prevPageBtn" onclick="changePage(-1)" disabled>&laquo; Previous</button>
+            <span class="current-page-display" id="pageIndicator">Page 1 of 1</span>
+            <button class="btn btn-sm btn-outline" id="nextPageBtn" onclick="changePage(1)" disabled>Next &raquo;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CLASSIFICATION SECTION -->
+    <section id="classification" class="page-section">
+      <div class="section-header">
+        <h2 class="section-title">K-Nearest Neighbors (KNN) Classification</h2>
+        <p class="section-subtitle">Configure model parameters and evaluate predictive performance directly against your dataset.</p>
+      </div>
+
+      <div class="classifier-config-card">
+        <div class="config-grid">
+          
+          <div class="form-group">
+            <label for="targetColSelect">Target Column (Label)</label>
+            <select id="targetColSelect">
+              <option value="">(Import dataset first)</option>
+            </select>
+            <small class="field-hint">Column indicating loan approval (e.g. Loan_Status, Approval)</small>
+          </div>
+
+          <div class="form-group">
+            <label for="kValueInput">K Value (Neighbors)</label>
+            <input type="number" id="kValueInput" min="1" max="51" step="2" value="5">
+            <small class="field-hint">Default is 5 (Odd numbers recommended to avoid ties)</small>
+          </div>
+
+          <div class="form-group">
+            <label for="splitRatioSelect">Training / Testing Split</label>
+            <select id="splitRatioSelect">
+              <option value="0.8" selected>80% Training / 20% Testing (Default)</option>
+              <option value="0.7">70% Training / 30% Testing</option>
+              <option value="0.75">75% Training / 25% Testing</option>
+              <option value="0.85">85% Training / 15% Testing</option>
+            </select>
+            <small class="field-hint">Proportion of dataset used for training vs validation</small>
+          </div>
+
+        </div>
+
+        <div class="config-actions">
+          <button class="btn btn-primary btn-large" id="runClassifierBtn" onclick="runKNNClassification()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Run Classification
+          </button>
+          <button class="btn btn-outline" onclick="runAllModelsAndNavigate()">
+            Compare All 5 Models &rarr;
+          </button>
+          <div id="classificationStatus" class="inline-status">Ready to train model</div>
+        </div>
+      </div>
+
+      <!-- Live Pipeline Details -->
+      <div class="model-pipeline-card">
+        <h3>Feature Engineering &amp; Normalization</h3>
+        <p class="pipeline-desc">The algorithm automatically cleans missing entries, performs Min-Max feature normalization on continuous income and loan amounts, and encodes categorical demographics for fair geometric distance computation.</p>
+        <div class="features-tag-list" id="activeFeaturesList">
+          <span class="feature-tag">ApplicantIncome</span>
+          <span class="feature-tag">CoapplicantIncome</span>
+          <span class="feature-tag">LoanAmount</span>
+          <span class="feature-tag">Loan_Amount_Term</span>
+          <span class="feature-tag">Credit_History</span>
+          <span class="feature-tag">Dependents</span>
+          <span class="feature-tag">Education</span>
+          <span class="feature-tag">Married</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. MODEL COMPARISON SECTION (NEW) -->
+    <section id="comparison" class="page-section">
+      <div class="section-header">
+        <h2 class="section-title">Multi-Model Performance Comparison</h2>
+        <p class="section-subtitle">Side-by-side performance evaluation of 5 supervised machine learning algorithms trained and tested on the identical split.</p>
+      </div>
+
+      <!-- Best Model Winner Banner -->
+      <div class="best-model-banner" id="bestModelBanner">
+        <div class="trophy-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9H3a2 2 0 0 0-2 2v2a5 5 0 0 0 5 5h1M18 9h3a2 2 0 0 1 2 2v2a5 5 0 0 1-5 5h-1M6 9h12v5a6 6 0 0 1-12 0V9zM9 22h6M12 18v4"/>
+          </svg>
+        </div>
+        <div class="banner-text">
+          <span class="banner-lead">Highest Performing Algorithm</span>
+          <h3 class="banner-title" id="bestModelName">Running evaluation...</h3>
+          <p class="banner-desc" id="bestModelDesc">Calculated from actual test dataset metrics across Accuracy, Precision, Recall, and F1-Score.</p>
+        </div>
+        <div class="banner-stat">
+          <span class="banner-stat-label">Best F1-Score</span>
+          <span class="banner-stat-value" id="bestModelScore">--</span>
+        </div>
+      </div>
+
+      <!-- Interactive Comparison Chart Card -->
+      <div class="comparison-chart-card">
+        <div class="comparison-chart-header">
+          <div>
+            <h3>Model Comparison Graph</h3>
+            <p class="comparison-chart-sub">Visualizing performance values dynamically calculated from actual test data</p>
+          </div>
+          <div class="metric-filter-pills">
+            <button class="pill-btn active" data-metric="all" onclick="filterComparisonMetric('all')">All Metrics</button>
+            <button class="pill-btn" data-metric="accuracy" onclick="filterComparisonMetric('accuracy')">Accuracy</button>
+            <button class="pill-btn" data-metric="precision" onclick="filterComparisonMetric('precision')">Precision</button>
+            <button class="pill-btn" data-metric="recall" onclick="filterComparisonMetric('recall')">Recall</button>
+            <button class="pill-btn" data-metric="f1" onclick="filterComparisonMetric('f1')">F1-Score</button>
+          </div>
+        </div>
+
+        <div class="comparison-chart-container" id="comparisonChartBox">
+          <!-- Dynamic SVG Chart rendered here -->
+        </div>
+
+        <div class="chart-legend-row" id="comparisonChartLegend">
+          <div class="legend-item"><span class="legend-dot" style="background:#1d4ed8;"></span> Accuracy</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Precision</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span> Recall</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> F1-Score</div>
+        </div>
+      </div>
+
+      <!-- Detailed Comparison Data Table -->
+      <div class="table-card" style="margin-top: 2rem;">
+        <div class="table-toolbar">
+          <div class="table-title-area">
+            <h3>Algorithm Performance Benchmark Table</h3>
+            <span class="table-count-badge" id="modelsEvaluatedCount">5 Models</span>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="trainAndCompareAllModels()">Re-train &amp; Benchmark</button>
+        </div>
+
+        <div class="table-responsive-container">
+          <table class="data-table" id="comparisonTable">
+            <thead>
+              <tr>
+                <th>Algorithm</th>
+                <th>Accuracy</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1-Score</th>
+                <th>True Positives (TP)</th>
+                <th>True Negatives (TN)</th>
+                <th>Verdict / Rank</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTableBody">
+              <!-- Dynamically populated rows for KNN, Logistic Regression, Decision Tree, Random Forest, Naive Bayes -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. LINEAR REGRESSION SECTION (NEW) -->
+    <section id="linear-regression" class="page-section">
+      <div class="section-header">
+        <h2 class="section-title">Linear Regression Analysis</h2>
+        <p class="section-subtitle">Predict eligible Loan Amount (₹) from Applicant Income (₹) using Ordinary Least Squares (OLS) regression.</p>
+      </div>
+
+      <div class="lr-layout">
+        <!-- Regression Equation & Model Parameters Card -->
+        <div class="lr-config-card">
+          <div class="lr-equation-box">
+            <span class="equation-label">Fitted Regression Model</span>
+            <div class="equation-display" id="lrEquationDisplay">LoanAmount = 4 &times; ApplicantIncome</div>
+            <p class="equation-hint">Underwriting Standard: Maximum eligible loan amount is calculated as 4 times the applicant's monthly salary.</p>
+          </div>
+
+          <div class="lr-metrics-row">
+            <div class="lr-stat">
+              <span class="lr-stat-lbl">Salary Multiplier (&beta;₁)</span>
+              <span class="lr-stat-val" id="lrSlopeVal">4.0000</span>
+            </div>
+            <div class="lr-stat">
+              <span class="lr-stat-lbl">Base Intercept (&beta;₀)</span>
+              <span class="lr-stat-val" id="lrInterceptVal">₹0</span>
+            </div>
+            <div class="lr-stat">
+              <span class="lr-stat-lbl">Eligibility Rule</span>
+              <span class="lr-stat-val" id="lrR2Val">4&times; Salary</span>
+            </div>
+            <div class="lr-stat">
+              <span class="lr-stat-lbl">Correlation (r)</span>
+              <span class="lr-stat-val" id="lrCorrVal">1.000</span>
+            </div>
+          </div>
+
+          <!-- Interactive Calculator -->
+          <div class="lr-calc-box">
+            <h4>Live Loan Amount Estimator</h4>
+            <div class="form-group" style="margin-top: 0.75rem;">
+              <label for="lrIncomeInput">Enter Applicant Monthly Income (₹ / month)</label>
+              <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <input type="number" id="lrIncomeInput" value="50000" min="0" step="any" style="flex:1;">
+                <button type="button" class="btn btn-primary" onclick="calculateLRPrediction()">Estimate Loan</button>
+              </div>
+            </div>
+            <div class="lr-calc-result" id="lrCalcResultBox">
+              <span>Estimated Eligible Loan Amount:</span>
+              <strong id="lrPredictedAmount">₹2,00,000</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scatter Plot & Regression Line Chart -->
+        <div class="chart-card lr-chart-card">
+          <div class="chart-header">
+            <h3>Scatter Plot &amp; Best-Fit Regression Line</h3>
+            <span class="chart-type-tag">OLS Linear Fit</span>
+          </div>
+          <div class="chart-container" id="lrScatterBox">
+            <!-- Dynamic SVG Scatter Plot with Regression line -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. APRIORI ALGORITHM & ASSOCIATION RULE MINING SECTION (NEW) -->
+    <section id="apriori" class="page-section">
+      <div class="section-header">
+        <h2 class="section-title">Apriori Algorithm &amp; Association Rule Mining</h2>
+        <p class="section-subtitle">Discover frequent itemsets and high-confidence association rules connecting borrower demographics with loan approval.</p>
+      </div>
+
+      <div class="apriori-controls-card">
+        <div class="config-grid">
+          <div class="form-group">
+            <label for="aprioriMinSupport">Minimum Support (%)</label>
+            <input type="number" id="aprioriMinSupport" min="5" max="80" step="5" value="15">
+            <small class="field-hint">Frequency of item combination in dataset (Default: 15%)</small>
+          </div>
+
+          <div class="form-group">
+            <label for="aprioriMinConfidence">Minimum Confidence (%)</label>
+            <input type="number" id="aprioriMinConfidence" min="20" max="95" step="5" value="60">
+            <small class="field-hint">Likelihood of Consequent given Antecedent (Default: 60%)</small>
+          </div>
+
+          <div class="form-group">
+            <label for="aprioriTargetFilter">Rule Consequent Filter</label>
+            <select id="aprioriTargetFilter">
+              <option value="all">All Association Rules</option>
+              <option value="Loan=Approved" selected>Rules leading to Loan Approved</option>
+              <option value="Loan=Rejected">Rules leading to Loan Rejected</option>
+            </select>
+            <small class="field-hint">Filter patterns targeting specific approval decisions</small>
+          </div>
+        </div>
+
+        <div class="config-actions">
+          <button class="btn btn-primary btn-large" onclick="runAprioriMining()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            Mine Association Rules
+          </button>
+          <div id="aprioriStatus" class="inline-status success">Apriori algorithm ready</div>
+        </div>
+      </div>
+
+      <!-- Mined Rules Table -->
+      <div class="table-card" style="margin-top: 1.5rem;">
+        <div class="table-toolbar">
+          <div class="table-title-area">
+            <h3>Discovered Association Rules</h3>
+            <span class="table-count-badge" id="aprioriRuleCountBadge">0 rules</span>
+          </div>
+        </div>
+
+        <div class="table-responsive-container">
+          <table class="data-table" id="aprioriTable">
+            <thead>
+              <tr>
+                <th>Rule ID</th>
+                <th>Antecedent (If...)</th>
+                <th>Consequent (Then...)</th>
+                <th>Support</th>
+                <th>Confidence</th>
+                <th>Lift Ratio</th>
+                <th>Significance</th>
+              </tr>
+            </thead>
+            <tbody id="aprioriTableBody">
+              <!-- Dynamically populated mined rules -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. RESULTS SECTION -->
+    <section id="results" class="page-section">
+      <div class="section-header">
+        <h2 class="section-title">Model Evaluation Results</h2>
+        <p class="section-subtitle">Real-time performance metrics computed from the dynamic test evaluation split.</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Accuracy</span>
+            <div class="metric-icon metric-icon-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricAccuracy">--</div>
+          <p class="metric-note">Correct predictions over total test evaluations</p>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Precision</span>
+            <div class="metric-icon metric-icon-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricPrecision">--</div>
+          <p class="metric-note">Ratio of correct approvals to all predicted approvals</p>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Recall</span>
+            <div class="metric-icon metric-icon-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <polyline points="17 11 19 13 23 9"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricRecall">--</div>
+          <p class="metric-note">Ratio of correctly detected approvals among actual approvals</p>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">F1 Score</span>
+            <div class="metric-icon metric-icon-gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricF1">--</div>
+          <p class="metric-note">Harmonic mean balance of Precision and Recall</p>
+        </div>
+      </div>
+
+      <div class="matrix-layout">
+        <div class="matrix-card">
+          <div class="matrix-header">
+            <h3>Confusion Matrix</h3>
+            <span class="matrix-tag" id="matrixSampleCount">Test Set: 0 samples</span>
+          </div>
+
+          <div class="table-responsive-container">
+            <table class="confusion-table">
+              <thead>
+                <tr>
+                  <th class="diagonal-th">Actual \ Predicted</th>
+                  <th>Predicted Approved</th>
+                  <th>Predicted Rejected</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th class="row-th">Actual Approved</th>
+                  <td class="cm-cell cm-tp">
+                    <span class="cm-val" id="cmTP">0</span>
+                    <span class="cm-lbl">True Positive (TP)</span>
+                  </td>
+                  <td class="cm-cell cm-fn">
+                    <span class="cm-val" id="cmFN">0</span>
+                    <span class="cm-lbl">False Negative (FN)</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="row-th">Actual Rejected</th>
+                  <td class="cm-cell cm-fp">
+                    <span class="cm-val" id="cmFP">0</span>
+                    <span class="cm-lbl">False Positive (FP)</span>
+                  </td>
+                  <td class="cm-cell cm-tn">
+                    <span class="cm-val" id="cmTN">0</span>
+                    <span class="cm-lbl">True Negative (TN)</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="model-summary-card">
+          <h3>Test Run Summary</h3>
+          <ul class="summary-details-list">
+            <li><span>Evaluation Date:</span> <strong id="resSummaryDate">Not run yet</strong></li>
+            <li><span>Training Samples:</span> <strong id="resSummaryTrain">0</strong></li>
+            <li><span>Testing Samples:</span> <strong id="resSummaryTest">0</strong></li>
+            <li><span>Target Class:</span> <strong id="resSummaryTarget">None</strong></li>
+            <li><span>Current Active Model:</span> <strong id="resSummaryK">KNN (K=5)</strong></li>
+          </ul>
+          <div class="summary-action-box">
+            <button class="btn btn-outline" onclick="navigateTo('classification')">Adjust Parameters</button>
+            <button class="btn btn-primary" onclick="navigateTo('comparison')">View Model Comparison</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. VISUALIZATION SECTION -->
+    <section id="visualization" class="page-section">
+      <div class="section-header">
+        <h2 class="section-title">Data Visualizations</h2>
+        <p class="section-subtitle">Visual summaries built dynamically using HTML5 Canvas &amp; SVG. Charts update automatically with loaded data.</p>
+      </div>
+
+      <div class="charts-grid">
+        
+        <!-- Chart 1: Approved vs Rejected -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>1. Approved vs Rejected</h3>
+            <span class="chart-type-tag">Donut Chart</span>
+          </div>
+          <div class="chart-container" id="chart1Container">
+            <div class="chart-content" id="chart1Box"></div>
+          </div>
+        </div>
+
+        <!-- Chart 2: Applicant Income Distribution -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>2. Applicant Income Distribution</h3>
+            <span class="chart-type-tag">Bar Chart</span>
+          </div>
+          <div class="chart-container" id="chart2Container">
+            <div class="chart-content" id="chart2Box"></div>
+          </div>
+        </div>
+
+        <!-- Chart 3: Loan Amount Distribution -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>3. Loan Amount Distribution</h3>
+            <span class="chart-type-tag">Histogram</span>
+          </div>
+          <div class="chart-container" id="chart3Container">
+            <div class="chart-content" id="chart3Box"></div>
+          </div>
+        </div>
+
+        <!-- Chart 4: Education vs Approval -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>4. Education vs Approval</h3>
+            <span class="chart-type-tag">Grouped Bar</span>
+          </div>
+          <div class="chart-container" id="chart4Container">
+            <div class="chart-content" id="chart4Box"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 Loan Approval Prediction &bull; Clean Data-Driven Credit Classification &amp; Mining Suite</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script src="script.js"></script>
+</body>
+</html>
